@@ -1,0 +1,12 @@
+moshpit-transport
+Copyright 2026 Profullstack
+
+Licensed under the Apache License, Version 2.0. See LICENSE.
+
+"Moshpit" and "Moshcode" are marks of Profullstack. The Apache License grants
+rights to the code; it does not grant permission to use these names to endorse
+or describe derived works. Reimplementing MTP/1 as described in README.md is
+expressly encouraged — call your implementation whatever you like.
+
+MTP/1 is a bespoke protocol that has not been externally reviewed. See the
+warning at the top of README.md.

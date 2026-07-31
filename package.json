@@ -1,0 +1,22 @@
+{
+  "name": "@profullstack/moshpit-transport",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "description": "Post-quantum authenticated transport for native Moshpit clients. Hybrid X25519 + ML-KEM-768 key agreement, ML-DSA-65 identity, no TLS and no certificates.",
+  "bin": {
+    "moshpit-keygen": "bin/moshpit-keygen.ts"
+  },
+  "scripts": {
+    "keygen": "node bin/moshpit-keygen.ts",
+    "test": "node --test tests/*.test.ts"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0"
+  }
+}
