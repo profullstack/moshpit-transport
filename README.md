@@ -79,14 +79,68 @@ two directions use different keys. Records cannot be reordered, replayed, or
 truncated without failing the tag. The sealer refuses to wrap the counter rather
 than reusing a nonce.
 
-## Use
+## Install
 
 ```sh
-node bin/moshpit-keygen.ts scrambled.eggs
+curl -fsSL https://raw.githubusercontent.com/profullstack/moshpit-transport/main/install.sh | sh
 ```
 
-Writes the identity to `~/.moshpit/identities/` with mode 600 and prints the pin
-to publish at [app.moshcode.sh/pit/dns](https://app.moshcode.sh/pit/dns).
+Installs under `~/.local` and needs no root. Set `MOSHPIT_PREFIX`, `MOSHPIT_BIN`
+or `MOSHPIT_REF` to change where or what. Uninstall with `install.sh --uninstall`.
+
+One-shot server setup, install and identity together:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/profullstack/moshpit-transport/main/install.sh \
+  | sh -s -- --with-identity scrambled.eggs
+```
+
+The installer checks Node by **capability, not version string** — it asks the
+runtime to generate an ML-KEM-768 and an ML-DSA-65 key, because a Node 24 built
+against OpenSSL < 3.5 passes a version check and then fails at the first
+handshake.
+
+If piping a script from the internet into a shell makes you uneasy, good:
+
+```sh
+curl -fsSL .../install.sh -o install.sh && less install.sh && sh install.sh
+```
+
+> **Browsing Moshpit? You need none of this.** [TronBrowser](https://tronbrowser.dev)
+> has built-in support — no DNS setup, no proxy, no root certificate, no install
+> script. This package is for **servers and native clients**.
+
+## Use
+
+### Tunnel an existing service
+
+The fastest way to put something behind MTP/1 without touching its code:
+
+```sh
+moshpit-keygen scrambled.eggs                    # prints the pin to publish
+
+# on the server — expose a service you already run
+moshpit-transport serve \
+  --identity ~/.moshpit/identities/scrambled.eggs.json \
+  --forward 127.0.0.1:8080 --listen 0.0.0.0:9443
+
+# on the client — a local port that tunnels to it
+moshpit-transport forward \
+  --to scrambled.eggs:9443 --pin <pin> --listen 127.0.0.1:1080
+```
+
+`curl http://127.0.0.1:1080/` now reaches the origin over an authenticated
+post-quantum channel. Neither the origin nor the client application knows it is
+being tunnelled, which is the point — adopting this should not mean rewriting
+anything against a new socket API.
+
+`--pin` is required. There is no unauthenticated mode and no TOFU: a native
+client ships with code that can fetch the registry, so it has no rollout excuse.
+
+Keygen writes the identity to `~/.moshpit/identities/` with mode 600 and prints
+the pin to publish at [app.moshcode.sh/pit/dns](https://app.moshcode.sh/pit/dns).
+
+### As a library
 
 ```ts
 import { createServer, connect, loadIdentity } from "./lib/index.ts";
